@@ -1,7 +1,7 @@
 require('dotenv').config();
 const http = require('http');
 const express = require('express');
-const db = require('../scripts/connect.js');
+const db = require('../scripts/login.js');
 
 const app = express();
 
@@ -14,16 +14,14 @@ const nocache = (_, resp, next) => {
   next();
 }
 
-
-async function addDataToDB(req, resp, next)
+async function login(req, res,next)
 {
-  let myDb = await db.dataBase();
-  const collection = await myDb.collection('col');
-  const insertResult = await collection.insertMany([{ a: 1 }, { a: 2 }, { a: 3 }]);
-  resp.json({result: 'ok'});
+  const response = await db.getUserInfo(req.params.email, req.params.password);
+  res.json({result: response});
 }
 
-app.get('/sample', nocache , addDataToDB);
+
+app.get('/login/:email/:password', nocache , login);
 
 app.listen(port, () => {
   console.log(`Server listening on ${port}`);
